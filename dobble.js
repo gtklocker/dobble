@@ -113,7 +113,7 @@ stickers = ["heart",
 "art",
 "snowflake",
 "yingyang",
-"hammer"]
+"hammer"];
 
 const emojiStickers = allEmojis();
 
