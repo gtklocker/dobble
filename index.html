@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
+  <style>
+    body {
+      padding: 5%;
+      max-width: 50%;
+      max-height: 400px;
+      margin: auto;
+    }
+    div {
+      text-align: center;
+    }
+    div#stackCards {
+      display: inline-block;
+    }
+    div#playerCards {
+      float: right;
+    }
+    circle {
+      fill: rgba(0, 0, 0, 0);
+      stroke: rgba(0, 0, 0, 0);
+    }
+    /* TODO: ugly hack to get the outer circle */
+    g:first-child > circle {
+      stroke: lightgray;
+      fill: #fbfbfb;
+      stroke-width: 2px;
+    }
+    svg.card {
+      filter: drop-shadow(0 0 5px lightgray);
+    }
+
+    svg.card.hidden {
+      display: none;
+    }
+
+    circle:hover {
+      cursor: pointer;
+    }
+
+    circle:hover + text, text:hover {
+      text-shadow: 0px 0px 8px lightseagreen;
+      cursor: pointer;
+    }
+
+    g.sticker.selection > text {
+      text-shadow: 0px 0px 8px black;
+      transform: scale(1.2);
+    }
+
+    text {
+      text-anchor: middle;
+      font-size: 3em;
+    }
+
+    text:hover {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="stackCards">
+    <p>Stack</p>
+  </div>
+  <div id="playerCards">
+    <p>Your card (<em id="remainingCardCount">n</em> remaining)</p>
+  </div>
+
+  <div>
+    <p>Time: <em id="time"></em></p>
+  </div>
+  <script type="text/javascript" src="dobble.js"></script>
+</body>
+</html>
