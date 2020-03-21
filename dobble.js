@@ -157,7 +157,7 @@ function updateCardCount() {
 class GameOver {}
 
 function putCardDown() {
-  _.head(stackSvgs).node().classList.add("hidden");
+  _.head(stackSvgs).classed("hidden", true);
   stackSvgs = [_.head(playerSvgs), ...stackSvgs];
   stackCards = [_.head(playerCards), ...stackCards];
   playerSvgs = _.tail(playerSvgs);
@@ -169,7 +169,7 @@ function putCardDown() {
 
   d3.select("#playerCards:first-child").remove();
   d3.select("#stackCards").insert(() => _.head(stackSvgs).node());
-  _.head(playerSvgs).node().classList.remove("hidden");
+  _.head(playerSvgs).classed("hidden", false);
 }
 
 function resetHandlers() {
