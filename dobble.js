@@ -136,9 +136,17 @@ function tryMatch() {
   stackStickerSelection = null;
   playerStickerSelection = null;
 
-  putCardDown();
-  resetHandlers();
-  updateCardCount();
+  try {
+    putCardDown();
+    resetHandlers();
+    updateCardCount();
+  } catch (e) {
+    if (e instanceof GameOver) {
+      endGame();
+      return;
+    }
+    console.error(e);
+  }
   return true;
 }
 
@@ -146,12 +154,18 @@ function updateCardCount() {
   d3.select("#remainingCardCount").html(`${playerCards.length}`);
 }
 
+class GameOver {}
+
 function putCardDown() {
   _.head(stackSvgs).node().classList.add("hidden");
   stackSvgs = [_.head(playerSvgs), ...stackSvgs];
   stackCards = [_.head(playerCards), ...stackCards];
   playerSvgs = _.tail(playerSvgs);
   playerCards = _.tail(playerCards);
+
+  if (playerCards.length == 0) {
+    throw new GameOver();
+  }
 
   d3.select("#playerCards:first-child").remove();
   d3.select("#stackCards").insert(() => _.head(stackSvgs).node());
@@ -186,7 +200,7 @@ function resetHandlers() {
     });
 }
 
-setInterval(function() {
+const timeTick = setInterval(function() {
   const deltaMs = Date.now() - startTime;
   const secs = deltaMs / 1000;
   const displaySecs = (""+Math.floor(secs % 60)).padStart(2, "0");
@@ -196,6 +210,14 @@ setInterval(function() {
   const displayHours = (""+Math.floor(hours % 24)).padStart(2, "0");
   d3.select("#time").html(`${displayHours}:${displayMins}:${displaySecs}`);
 }, 60);
+
+function endGame() {
+  d3.select("div#stackCards").remove();
+  d3.select("div#playerCards").remove();
+  d3.select("div#timer")
+    .classed("big", true);
+  clearInterval(timeTick);
+}
 
 const startTime = Date.now();
 resetHandlers();
