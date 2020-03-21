@@ -217,7 +217,7 @@ const timeTick = setInterval(function() {
   const hours = mins / 60;
   const displayHours = (""+Math.floor(hours % 24)).padStart(2, "0");
   d3.select("#time").html(`${displayHours}:${displayMins}:${displaySecs}`);
-}, 60);
+}, 1000);
 
 function endGame() {
   d3.select("div#stackCards").remove();
