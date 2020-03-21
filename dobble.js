@@ -178,6 +178,10 @@ function resetHandlers() {
     .on("click", function () {
       if (stackStickerSelection !== null) {
         stackStickerSelection.classList.toggle("selection");
+        if (stackStickerSelection === this) {
+          stackStickerSelection = null;
+          return;
+        }
       }
       stackStickerSelection = this;
       if (playerStickerSelection !== null && tryMatch()) {
@@ -191,6 +195,10 @@ function resetHandlers() {
     .on("click", function () {
       if (playerStickerSelection !== null) {
         playerStickerSelection.classList.toggle("selection");
+        if (playerStickerSelection === this) {
+          playerStickerSelection = null;
+          return;
+        }
       }
       playerStickerSelection = this;
       if (stackStickerSelection !== null && tryMatch()) {
