@@ -125,7 +125,7 @@ for (let i = 0; i < playerCards.length; ++i) {
   playerSvgs.push(drawCard(playerCards[i], i+1, "#playerCards", i !== 0));
 }
 
-function tryMatch() {
+async function tryMatch() {
   const stackSticker = stickerFromCardGroup(stackStickerSelection);
   const playerSticker = stickerFromCardGroup(playerStickerSelection);
   if (stackSticker !== playerSticker) {
@@ -137,7 +137,7 @@ function tryMatch() {
   playerStickerSelection = null;
 
   try {
-    putCardDown();
+    await putCardDown();
     resetHandlers();
     updateCardCount();
   } catch (e) {
@@ -156,8 +156,19 @@ function updateCardCount() {
 
 class GameOver {}
 
-function putCardDown() {
+function promisifyEvent(chain, evt) {
+  return new Promise(resolve => chain.on(evt, resolve));
+}
+
+async function putCardDown() {
   _.head(stackSvgs).classed("hidden", true);
+  await promisifyEvent(_.head(playerSvgs)
+    .transition()
+    .attr("transform", () => "translate(" + [-370, 0] + ")")
+    .duration(200)
+    .ease(d3.easeExp), "end");
+  _.head(playerSvgs).attr("transform", () => "translate(0,0)");
+
   stackSvgs = [_.head(playerSvgs), ...stackSvgs];
   stackCards = [_.head(playerCards), ...stackCards];
   playerSvgs = _.tail(playerSvgs);
@@ -172,10 +183,10 @@ function putCardDown() {
   _.head(playerSvgs).classed("hidden", false);
 }
 
-function resetHandlers() {
+async function resetHandlers() {
   _.head(stackSvgs)
     .selectAll("g.sticker")
-    .on("click", function () {
+    .on("click", async function () {
       if (stackStickerSelection !== null) {
         stackStickerSelection.classList.toggle("selection");
         if (stackStickerSelection === this) {
@@ -184,7 +195,7 @@ function resetHandlers() {
         }
       }
       stackStickerSelection = this;
-      if (playerStickerSelection !== null && tryMatch()) {
+      if (playerStickerSelection !== null && await tryMatch()) {
         return;
       }
       this.classList.toggle("selection");
@@ -192,7 +203,7 @@ function resetHandlers() {
 
   _.head(playerSvgs)
     .selectAll("g.sticker")
-    .on("click", function () {
+    .on("click", async function () {
       if (playerStickerSelection !== null) {
         playerStickerSelection.classList.toggle("selection");
         if (playerStickerSelection === this) {
@@ -201,7 +212,7 @@ function resetHandlers() {
         }
       }
       playerStickerSelection = this;
-      if (stackStickerSelection !== null && tryMatch()) {
+      if (stackStickerSelection !== null && await tryMatch()) {
         return;
       }
       this.classList.toggle("selection");
