@@ -175,8 +175,7 @@ function getCirclePosition(selector) {
     } else {
       var transform = elem.transform.baseVal.consolidate();
       if (transform) {
-        var matrix = elem.transform.baseVal.consolidate().matrix;
-        pt = pt.matrixTransform(matrix);
+        pt = pt.matrixTransform(transform.matrix);
       }
     }
     if (elem.parentNode == document.body)
