@@ -59,10 +59,22 @@ const deck = _.shuffle(originalDeck.map(_.shuffle));
 
 const emojiStickers = allEmojis();
 
+function radiusFromRand(rand) {
+  return Math.floor((rand*0.8+0.8)*100)/100;
+}
+
+function angleFromRand(rand) {
+  return Math.ceil(rand*120-60);
+}
+
 function cardToData(card) {
   return {
     "name": "somecard",
-    "children": card.map(i => ({"name": emojiStickers[i]})),
+    "children": card.map(i => ({
+      "name": emojiStickers[i],
+      "radius": radiusFromRand(Math.random()),
+      "angle": angleFromRand(Math.random()),
+    })),
   };
 }
 
@@ -70,7 +82,8 @@ function drawCard(card, id, where, hidden) {
   var packLayout = d3.pack();
   packLayout.size([300, 300]);
 
-  const rootNode = d3.hierarchy(cardToData(card)).sum(function (d) { return d.name ? 1 : 0; });
+  const rootNode = d3.hierarchy(cardToData(card))
+    .sum(d => d.radius);
 
   packLayout(rootNode);
 
@@ -87,7 +100,10 @@ function drawCard(card, id, where, hidden) {
     .enter()
     .append("g")
     .attr("class", "sticker")
-    .attr("transform", function (d) { return "translate(" + [d.x, d.y] + ")" })
+    .attr("transform", d => [
+      `translate(${[d.x, d.y]})`,
+      `rotate(${d.data.angle || 0})`,
+    ].join(" "));
 
   nodes
     .append("circle")
@@ -96,6 +112,7 @@ function drawCard(card, id, where, hidden) {
   nodes
     .append("text")
     .attr("dy", 18)
+    .attr("transform", d => `scale(${d.data.radius || 1})`)
     .text(function (d) {
       return d.children === undefined ? d.data.name : "";
     })
