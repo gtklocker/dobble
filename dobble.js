@@ -160,14 +160,43 @@ function promisifyEvent(chain, evt) {
   return new Promise(resolve => chain.on(evt, resolve));
 }
 
+function getCirclePosition(selector) {
+  var elem = document.querySelector(selector);
+  var svg = elem.ownerSVGElement;
+
+  var pt = svg.createSVGPoint();
+  pt.x = elem.cx.baseVal.value;
+  pt.y = elem.cy.baseVal.value;
+
+  while (true) {
+    if (elem.offsetLeft !== undefined) {
+      pt.x += elem.offsetLeft;
+      pt.y += elem.offsetTop;
+    } else {
+      var transform = elem.transform.baseVal.consolidate();
+      if (transform) {
+        var matrix = elem.transform.baseVal.consolidate().matrix;
+        pt = pt.matrixTransform(matrix);
+      }
+    }
+    if (elem.parentNode == document.body)
+      break;
+    elem = elem.parentNode;
+  }
+  return pt;
+}
+
 async function putCardDown() {
-  _.head(stackSvgs).classed("hidden", true);
+  const stackPos = getCirclePosition("#stackCards > svg > g > circle");
+  const playerPos = getCirclePosition("#playerCards > svg > g > circle");
+
   await promisifyEvent(_.head(playerSvgs)
     .transition()
-    .attr("transform", () => "translate(" + [-370, 0] + ")")
-    .duration(200)
+    .attr("transform", () => "translate(" + [stackPos.x-playerPos.x, stackPos.y-playerPos.y] + ")")
+    .duration(500)
     .ease(d3.easeExp), "end");
   _.head(playerSvgs).attr("transform", () => "translate(0,0)");
+  _.head(stackSvgs).classed("hidden", true);
 
   stackSvgs = [_.head(playerSvgs), ...stackSvgs];
   stackCards = [_.head(playerCards), ...stackCards];
